@@ -16,4 +16,4 @@ python main.py
 ## How it works
 Simply enter the album links when prompted.
 
-The bot will scrape the website, download the music tracks, and organize them into folders—one for each album.
+The bot will scrape the website, download the music tracks, and organize them into folders — one for each album.
