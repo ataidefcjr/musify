@@ -13,8 +13,8 @@ while '' not in urls:
     urls.append(input())
 
 def format_filename(filename:str):
-    caracteres_proibidos = r'[\/:*"<>|]'
-    new_filename = re.sub(caracteres_proibidos, "_", filename)
+    caracteres_permitidos = r'[^a-zA-Z0-9\-\_\(\) \[\]]'
+    new_filename = re.sub(caracteres_permitidos, "_", filename)
     return new_filename
 
 def format_index(link:str):
@@ -61,6 +61,7 @@ if __name__ == '__main__':
         folder_title = folder_title.find('h1').text
         folder_title = format_filename(folder_title)
         band_name = soap.find('a', attrs={'itemprop' : 'byArtist'}).text.strip()
+        band_name = format_filename(band_name)
         links = soap.find_all('div', attrs={'class' : 'playlist__item'})
         for link in links:
             index = format_index(link)
@@ -72,7 +73,7 @@ if __name__ == '__main__':
                     download_link = base_url + a['href']
                     save_path = os.path.join (folder_title , index + " - " + band_name + " - " + music_name + ".mp3")
                     download_list.append({'url': download_link, 'save_path' : save_path})
-        print("Creating directories, please wait...")
+        print(f"Processed link {url}...")
         try:
             directory = os.mkdir(folder_title)
         except FileExistsError:
