@@ -3,11 +3,12 @@ import requests
 import os
 from concurrent.futures import ThreadPoolExecutor
 import re
+from time import sleep
 
 base_url = "https://musify.club"
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
 urls = []
-print("Insira os URLs de https://musify.club abaixo separados por enter, linha vazia para terminar: ")
+print("Enter the URLs from https://musify.club below, separated by enter. Leave a blank line to finish: ")
 while '' not in urls:
     urls.append(input())
 
@@ -26,18 +27,19 @@ def download_file(url, save_path):
     try:
         for _ in range(3): 
             if os.path.exists(save_path):
-                print(f"Arquivo {save_path.split('/')[1]} Já existe, pulando download.")
+                print(f"File {save_path.split('/')[1]} already exists, skipping download.")
                 return
             response = requests.get(url, headers=headers, timeout=10)
             if response.status_code == 200:
                 with open(save_path, 'wb') as f:
                     f.write(response.content)
-                print(f"Arquivo Salvo: {save_path}")
+                print(f"Successfully downloaded: {save_path}")
                 return
-            print(f"Erro ao baixar o arquivo: {save_path}, Retry: {_}")
-        print(f"Abortado download de {url}")
+            print(f"Error downloading file: {save_path}, Retry in 3 seconds")
+            sleep(3)
+        print(f"Download aborted for {url}")
     except Exception as e:
-        print(f"Ocorreu um erro ao baixar a url: {url}")
+        print(f"An error occurred while downloading the URL: {url}")
 
 def download_multiple_files(downloadlist, max_threads=12):
     with ThreadPoolExecutor(max_workers=max_threads) as executor:
@@ -70,15 +72,14 @@ if __name__ == '__main__':
                     download_link = base_url + a['href']
                     save_path = os.path.join (folder_title , index + " - " + band_name + " - " + music_name + ".mp3")
                     download_list.append({'url': download_link, 'save_path' : save_path})
-        print("Criando Diretórios, aguarde...")
+        print("Creating directories, please wait...")
         try:
             directory = os.mkdir(folder_title)
         except FileExistsError:
-            print(f"Diretório {folder_title} já existe.")
+            print(f"Directory {folder_title} already exists.")
 
-    print("Iniciando os Downloads")
-    download_multiple_files(download_list)
-        
-    print("Finalizado todos os Links!!")
+    print("Starting downloads")
+    download_multiple_files(download_list)    
+    print("All links processed!")
 
         
